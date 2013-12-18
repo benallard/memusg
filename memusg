@@ -29,7 +29,7 @@ child_command = ' '.join(child_args)
 
 def log(msg):
     if DEBUG:
-        print >>sys.stderr, "memusg: {}".format(msg)
+        print >>sys.stderr, "memusg: {0}".format(msg)
 
 def get_vsize(sid):
     vsize = 0
@@ -49,7 +49,7 @@ def get_vsize(sid):
 pid = os.getpid()
 sid = os.getsid(pid)
 pgid = os.getpgid(pid)
-log("Pre-fork: PID is {} ; PGID is {} ; SID is {}".format(pid, pgid, sid))
+log("Pre-fork: PID is {0} ; PGID is {1} ; SID is {2}".format(pid, pgid, sid))
 
 fork_pid = os.fork()
 if fork_pid == 0:
@@ -57,35 +57,35 @@ if fork_pid == 0:
     pid = os.getpid()
     sid = os.getsid(pid)
     pgid = os.getpgid(pid)
-    log("Post-fork: PID is {} ; PGID is {} ; SID is {}".format(pid, pgid, sid))
+    log("Post-fork: PID is {0} ; PGID is {1} ; SID is {2}".format(pid, pgid, sid))
 
     log("Trying to init our own session".format(pid, pgid))
     os.setsid()
     sid = os.getsid(pid)
     pgid = os.getpgid(pid)
-    log("Post-session init: PID is {} ; PGID is {} ; SID is {}".format(pid, pgid, sid))
+    log("Post-session init: PID is {0} ; PGID is {1} ; SID is {2}".format(pid, pgid, sid))
         
-    log("Starting child: {}".format(child_command))
+    log("Starting child: {0}".format(child_command))
     # "None" means "inherit from parent"
     proc = Popen(child_command, stdin=None, stdout=None, stderr=None, env=None, shell=True)
 
     vmpeak = -1
     while proc.returncode == None:
         vmpeak = max(get_vsize(sid), vmpeak)
-        log("Waiting for child to exit. vmpeak={}".format(vmpeak))
+        log("Waiting for child to exit. vmpeak={0}".format(vmpeak))
         proc.poll()
         sleep(0.1) # Time in seconds (float)
     
-    out.write("memusg: vmpeak: {} kb\n".format(vmpeak))
+    out.write("memusg: vmpeak: {0} kb\n".format(vmpeak))
 
     status = proc.returncode
-    log("Child process returned {}".format(status))
+    log("Child process returned {0}".format(status))
     sys.exit(status)
 
 else:
     # This is the branch of fork that continues the original process
     (_fork_pid, full_status) = os.waitpid(fork_pid, 0)
     status = full_status >> 8
-    log("Fork returned {}".format(status))
+    log("Fork returned {0}".format(status))
     out.close()
     sys.exit(status)
